@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Empresa</title>
+</head>
+<body>
+    <div class="formulario">
+        <form id="cadastro-form">
+            <label for="cnpj">CNPJ:</label>
+            <input type="text" placeholder="CNPJ" id="cnpj" name="cnpj" required><br/><br/>
+
+            <label for="razao-social">Razão Social:</label>
+            <input type="text" id="razao-social" name="razaoSocial" placeholder="Razão Social" required><br/><br/>
+
+            <label for="nome-fantasia">Nome Fantasia:</label>
+            <input type="text" id="nome-fantasia" name="nomeFantasia" placeholder="Nome Fantasia" required><br/><br/>
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" placeholder="Endereço" required><br/><br/>
+
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" placeholder="Cidade" required><br/><br/>
+
+            <label for="uf">UF:</label>
+            <select id="uf" name="uf" required>
+                <option selected disabled value="">Selecione</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+            </select>
+            <br><br>
+
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" placeholder="CEP" required><br/><br/>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Email" required><br/><br/>
+
+            <label for="telefone">Telefone:</label>
+            <input type="text" id="telefone" name="telefone" placeholder="Telefone" required><br/><br/>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+
+    <div id="lista-empresas">
+        <h2>Empresas Cadastradas:</h2>
+        <ul id="empresas-lista"></ul>
+    </div>
+
+    <script>
+        document.getElementById('cadastro-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch('/cadastrar', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.errors) {
+                    alert(data.errors.join('\n'));
+                } else {
+                    const listaEmpresas = document.getElementById('empresas-lista');
+                    listaEmpresas.innerHTML = '';
+                    data.empresas.forEach(empresa => {
+                        const li = document.createElement('li');
+                        li.textContent = `${empresa.razaoSocial} (${empresa.nomeFantasia}) - CNPJ: ${empresa.cnpj}`;
+                        listaEmpresas.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        });
+
+        window.onload = function() {
+            fetch('/empresas')
+                .then(response => response.json())
+                .then(data => {
+                    const listaEmpresas = document.getElementById('empresas-lista');
+                    listaEmpresas.innerHTML = '';
+                    data.forEach(empresa => {
+                        const li = document.createElement('li');
+                        li.textContent = `${empresa.razaoSocial} (${empresa.nomeFantasia}) - CNPJ: ${empresa.cnpj}`;
+                        listaEmpresas.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Erro:', error));
+        };
+    </script>
+</body>
+</html>
